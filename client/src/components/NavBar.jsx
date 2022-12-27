@@ -15,6 +15,7 @@ const NavbarItem = ({title, classProps}) => {
 
 const NavBar = () => {
 
+    // flag to check whether in mobile view or not
     const [toggleMenu, setToggleMenu] = useState(false);
 
     return (
@@ -42,6 +43,23 @@ const NavBar = () => {
                     ? <AiOutlineClose fontSize={28} className='text-white md:hidden cursor-pointer' onClick={ () => setToggleMenu(false)} />
                     : <HiMenuAlt4 fontSize={28} className='text-white md:hidden cursor-pointer' onClick={ () => setToggleMenu(true)} />
                 }
+                {/* only when in mobile view */}
+                { toggleMenu && (
+                    // the classes of this ul
+                    <ul 
+                        className='z-10 fixed top-0 -right-2 p-3 width-[70vw] h-screen shadow-2xl md:hidden list-none
+                                        flex flex-col justify-start items-end rounded-md blue-glassmorphism text-white animate-slide-in '>
+                        <li className='text-xl w-full my-2'>
+                            {/* when in mobile view, click it to (false) close it */}
+                            <AiOutlineClose onClick={ () => setToggleMenu(false)} />
+                        </li>
+                        {
+                            ["Market", "Exchange", "Tutorials", "Wallets"].map( (item, index) => (
+                                <NavbarItem key={item + index} title={item} classProps='my-2 text-lg' />
+                            ))
+                        }
+                    </ul>
+                )}
             </div>
         </nav>
     );
