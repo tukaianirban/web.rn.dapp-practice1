@@ -1,0 +1,11 @@
+Vite (vitejs.dev) is a tooling service that helps to create, init React faster and leaner.
+
+
+Tailwind is a utility-first CSS framework with prebuilt classes that are used to build webpages.
+Simply put, you do not need to create css class; they are all built in.
+After init, get your configurations in place with the configs under: https://tailwindcss.com/docs/guides/create-react-app
+If you need to understand any property used, just search for the string in the tailwind docs.
+
+In this project we use npm install for installing new packages, and yarn for adding and removing packages 
+(already installed in node_modules/) to our repo (yarn.lock).
+Alternatively, use ' npm add <package name> ' for adding the package into package-lock.json
