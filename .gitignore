@@ -1,1 +1,4 @@
 .DS_Store
+node_modules
+./smart_contract/node_modules
+./client_node_modules
