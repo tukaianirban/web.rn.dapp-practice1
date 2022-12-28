@@ -3,6 +3,8 @@ import { SiEthereum } from 'react-icons/si';
 import { BsInfoCircle } from 'react-icons/bs';
 
 import { Loader } from './';
+import { useContext } from 'react';
+import { TransactionContext } from '../context/TransactionContext';
 
 const commonStyles = 'min-h-[70px] sm:px-0 px-2 flex justify-center items-center border-[0.5px] \
 border-gray-400 text-sm font-light text-white';
@@ -14,19 +16,34 @@ const Input = ({placeholder, name, type, value, handleChange}) => {
             type={type}
             step="0.0001"
             value={value}
-            onChange={() => handleChange(e, name)}
+            onChange={(e) => handleChange(e, name)}
             className='my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism'
             />
     );
 }
 const Welcome = () => {
 
-    const connectWallet = () => {
-
-    }
+    // handleChange will be called for every change in any of the input fields
+    // for every change, the 'name' of the input field and the <event.target.value> will be used
+    // the setFormData will update the initial structure with the name of the input field mapped to the target.value of the field
+    const { connectWallet, connectedAccount, formData, sendTransaction, handleChange } = useContext(TransactionContext);
 
     // called when user presses the Submit button in the form
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+
+        // destructure the formDta that was being built-up through the handleChange and setFormData
+        const { addressTo, amount, keyword, message } = formData;
+
+        // do not reload the page when the user presses on form submit
+        e.preventDefault();
+
+        if (!addressTo || !amount || !keyword || !message) {
+            console.log('user has not filled in all the form input fields');
+            console.log({ addressTo, amount, keyword, message });
+            return;
+        } 
+
+        sendTransaction();
 
     }
 
@@ -40,9 +57,14 @@ const Welcome = () => {
                     <p className='text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base'>
                         Explore the crypto world. Buy and sell easily
                     </p>
-                    <button type='button' onClick={connectWallet} className='flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]'>
-                        <p className='text-white text-base font-semibold'>Connect Wallet</p>
-                    </button>
+                    
+                    {!connectedAccount && (
+                            <button type='button' onClick={connectWallet} className='flex flex-row justify-center items-center my-5 bg-[#2952e3] p-3 rounded-full cursor-pointer hover:bg-[#2546bd]'>
+                                <p className='text-white text-base font-semibold'>Connect Wallet</p>
+                            </button>
+                        )
+                    }
+                    
 
                     <div className='grid grid-cols-3 w-full mt-10'>
                         <div className={`rounded-tl-2xl ${commonStyles}`}>
@@ -92,10 +114,10 @@ const Welcome = () => {
                     </div>
 
                     <div className='p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism'>
-                        <Input placeholder="Address To" name="addressTo" type='text' handleChange={ () => {}} />
-                        <Input placeholder="Amount (ETH)" name="amount" type='number' handleChange={ () => {}} />
-                        <Input placeholder="Keyword (Gif)" name="keyword" type='text' handleChange={ () => {}} />
-                        <Input placeholder="Enter message" name="message" type='text' handleChange={ () => {}} />
+                        <Input placeholder="Address To" name="addressTo" type='text' handleChange={handleChange} />
+                        <Input placeholder="Amount (ETH)" name="amount" type='number' handleChange={handleChange} />
+                        <Input placeholder="Keyword (Gif)" name="keyword" type='text' handleChange={handleChange} />
+                        <Input placeholder="Enter message" name="message" type='text' handleChange={handleChange} />
                     
                         {/* the grayish line below the form fields */}
                         <div className='h-[1px] w-full bg-gray-400 my-2' />
