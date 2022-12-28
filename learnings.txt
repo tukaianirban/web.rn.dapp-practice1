@@ -35,3 +35,17 @@ to Validate whether the installation / initialisation was done right or not, run
 # npx hardhat test
 
 The Solidity extension for VS Code provides code highlighting and makes it easier to write.
+
+In the hardhat config, the accounts config of ropsten literally takes in the private key of the account 
+that will fund the dpeloyment of the contract. EXTREMELY DANGEROUS !!!
+
+To deploy the contract on a network:
+# npx hardhat run scripts/deploy.js --network goerli
+
+When the smart contract is deployed, a few things are known:
+- the blockchain address where the contract was deployed
+- the ABI (Application Binary Interface) " smart_contract/artifacts/contracts/<contractname>.json " is generated.
+    -> the standard API through which to communicate with a contract both from outside of the blockchain and also 
+    for contract-to-contract communication.
+
+For the client to be able to use the ABI, copy the ABI file to under client/src/<>
