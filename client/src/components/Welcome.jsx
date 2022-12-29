@@ -5,6 +5,7 @@ import { BsInfoCircle } from 'react-icons/bs';
 import { Loader } from './';
 import { useContext } from 'react';
 import { TransactionContext } from '../context/TransactionContext';
+import { shortenAddress } from '../utils/shortenAddress';
 
 const commonStyles = 'min-h-[70px] sm:px-0 px-2 flex justify-center items-center border-[0.5px] \
 border-gray-400 text-sm font-light text-white';
@@ -104,7 +105,7 @@ const Welcome = () => {
                             <div>
                                 {/* display teh currently connected wallet address */}
                                 <p className='text-white font-light text-sm'>
-                                    0xkjdsgd;gdkhgvkd .... fagsgdavgdh
+                                    {shortenAddress(connectedAccount)}
                                 </p>
                                 <p className='text-white font-semibold text-lg mt-1'>
                                     Ethereum
