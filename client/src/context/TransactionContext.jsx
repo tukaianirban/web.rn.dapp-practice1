@@ -19,8 +19,7 @@ const getEthereumContract = () => {
     // all 3 things are needed for fetching the contract (address, abi, signer)
     const transactionContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-    console.log({ provider, signer, transactionContract });
-
+    return transactionContract;
 }
 
 /**
@@ -31,6 +30,10 @@ export const TransactionProvider = ({ children }) => {
 
     const [connectedAccount, setConnectedAccount] = useState('');
     const [formData, setFormData] = useState({ addressTo: '', amount: '', keyword: '', message: '' });
+    const [isLoading, setIsLoading] = useState(false);
+    // store the value in local storage so that latest value is retrieved when page refreshes
+    // TODO: learn more about this !!!
+    const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'));
 
     // any handleChange event that is triggered on change of data, 
     // has the event (e) already in the call args
@@ -92,7 +95,43 @@ export const TransactionProvider = ({ children }) => {
             if (!ethereum) return alert('Please install MetaMask');
 
             const { addressTo, amount, keyword, message } = formData;
-            getEthereumContract();
+            const transactionContract = getEthereumContract();
+
+            // convert decimal to GWei (Hex) amount 
+            const parsedAmount = ethers.utils.parseEther(amount);
+
+            // the gas amount is specified in HEX; because all values in ETH network are written in 
+            // HEX format.
+            // this just calls the transaction to be done on-chain
+            await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    from: connectedAccount,
+                    to: addressTo,
+                    gas: '0x5208',                  // eq to 21,000 GWei
+                    value: parsedAmount._hex,      // the amount of crypto to be transferred (in hex)
+                }]
+            });
+
+            // store the (crypto transfer) transaction info in the contract
+            // once that transaction is triggered, you will receive a hash of the transaction through which this 'add' 
+            // transaction will be added to the smart contract
+            // at this stage, the transaction (to add the transfer info to the contract) is only triggered
+            const transactionHash = await transactionContract.addToBlockchain(addressTo, parsedAmount, message, keyword);
+            
+            // set loading state to true until the transaction hash is resolved
+            setIsLoading(true);
+            console.log(`loading - ${transactionHash.hash}`);
+
+            // wait for the transaction (to add transfer info to contract) to be completed
+            await transactionHash.wait();
+
+            // once the transaction is settled, set loading state to false
+            setIsLoading(false);
+            console.log(`success - ${transactionHash.hash}`);
+
+            const transactionCount = await transactionContract.getTransactionCount();
+            setTransactionCount(transactionCount.toNumber());
 
         } catch(error) {
             console.error(error);
