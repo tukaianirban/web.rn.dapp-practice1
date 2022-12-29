@@ -51,7 +51,7 @@ const TransactionCard = ({ addressTo, addressFrom, timestamp, message, keyword, 
 }
 const Transactions = () => {
 
-    const { connectedAccount } = useContext(TransactionContext);
+    const { connectedAccount, transactions } = useContext(TransactionContext);
   
 
     return (
@@ -73,7 +73,7 @@ const Transactions = () => {
                 }
 
                 <div className='flex flex-wrap justify-center items-center mt-10'>
-                    {dummyData.reverse().map( (transaction, i) => (
+                    {transactions.reverse().map( (transaction, i) => (
                         // take each item in the dummy transactions array and 
                         // pass them to the JSX element
                         <TransactionCard key={i} {...transaction} />

@@ -34,11 +34,38 @@ export const TransactionProvider = ({ children }) => {
     // store the value in local storage so that latest value is retrieved when page refreshes
     // TODO: learn more about this !!!
     const [transactionCount, setTransactionCount] = useState(localStorage.getItem('transactionCount'));
+    const [transactions, setTransactions] = useState([]);
 
     // any handleChange event that is triggered on change of data, 
     // has the event (e) already in the call args
     const handleChange = (e, name) => {
         setFormData( (prevState) => ({ ...prevState, [name]: e.target.value }));
+    }
+
+    const getAllTransactions = async() => {
+
+        try {
+
+            if (!ethereum) return alert('Please install metamask');
+
+            const transactionContract = getEthereumContract();
+            const availableTransactions = await transactionContract.getAllTransactions();
+
+            const structuredTransactions = availableTransactions.map((transaction) => ({
+                addressTo: transaction.receiver,
+                addressFrom: transaction.sender,
+                timestamp: new Date(transaction.timestamp.toNumber() * 1000).toLocaleString(),
+                message: transaction.message,
+                keyword: transaction.keyword,
+                amount: parseInt(transaction.amount._hex) / (10 ** 18),
+            }));
+
+            setTransactions(structuredTransactions);
+
+            console.log('all transactions: ', structuredTransactions);
+        } catch(error) {
+            console.error(error);
+        }
     }
 
     const checkIfWalletIsConnected = async() => {
@@ -53,6 +80,8 @@ export const TransactionProvider = ({ children }) => {
             if (accounts.length > 0) {
                 console.log('Accounts connected to this DApp:', accounts);
                 setConnectedAccount(accounts[0]);
+
+                getAllTransactions();
     
                 // also update the Transactions display section of the page here !
             } else {
@@ -62,6 +91,22 @@ export const TransactionProvider = ({ children }) => {
         } catch(error) {
 
             // likely that ethereum object is undefined here
+            console.error(error);
+            throw new Error('No ethereum object');
+        }
+    }
+
+    const checkIfTransactionsExist = async() => {
+
+        try{
+
+            const transactionContract = getEthereumContract();
+            const transactionCount = await transactionContract.getTransactionCount();
+
+            window.localStorage.setItem('transactionCount', transactionCount);
+
+        } catch(error) {
+
             console.error(error);
             throw new Error('No ethereum object');
         }
@@ -141,6 +186,7 @@ export const TransactionProvider = ({ children }) => {
     
     useEffect( () => {
         checkIfWalletIsConnected();
+        checkIfTransactionsExist();
     }, []);
 
 
@@ -148,7 +194,7 @@ export const TransactionProvider = ({ children }) => {
     // all functions and values defined above are therefore made available to the rest of the app this way.
     return (
         // 
-        <TransactionContext.Provider value={{ connectWallet, connectedAccount, formData, setFormData, handleChange, sendTransaction }}>
+        <TransactionContext.Provider value={{ connectWallet, connectedAccount, formData, setFormData, handleChange, sendTransaction, transactions, isLoading }}>
             {children}
         </TransactionContext.Provider>
     );

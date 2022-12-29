@@ -27,7 +27,7 @@ const Welcome = () => {
     // handleChange will be called for every change in any of the input fields
     // for every change, the 'name' of the input field and the <event.target.value> will be used
     // the setFormData will update the initial structure with the name of the input field mapped to the target.value of the field
-    const { connectWallet, connectedAccount, formData, sendTransaction, handleChange } = useContext(TransactionContext);
+    const { connectWallet, connectedAccount, formData, sendTransaction, handleChange, isLoading } = useContext(TransactionContext);
 
     // called when user presses the Submit button in the form
     const handleSubmit = (e) => {
@@ -123,7 +123,7 @@ const Welcome = () => {
                         {/* the grayish line below the form fields */}
                         <div className='h-[1px] w-full bg-gray-400 my-2' />
 
-                        {false 
+                        {isLoading 
                             ? (<Loader />)
                             : (
                                 <button 
