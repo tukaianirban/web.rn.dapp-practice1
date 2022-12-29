@@ -1,5 +1,6 @@
 Vite (vitejs.dev) is a tooling service that helps to create, init React faster and leaner.
-
+To load environment variables, create a .env file inside the root folder of the client.
+Add a .env file and add in the value as <key>=<value>
 
 Tailwind is a utility-first CSS framework with prebuilt classes that are used to build webpages.
 Simply put, you do not need to create css class; they are all built in.
